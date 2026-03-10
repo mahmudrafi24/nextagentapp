@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
+import '../../../core/widgets/support_bottom_sheet.dart';
 import '../../controllers/home_controller.dart';
 import 'widgets/morning_briefing_card.dart';
 import 'widgets/quick_actions_row.dart';
@@ -24,6 +25,7 @@ class HomePage extends StatelessWidget {
               _MoreTab(),
             ],
           )),
+      floatingActionButton: _GetHelpButton(),
       bottomNavigationBar: Obx(() => BottomNavigationBar(
             currentIndex: controller.currentTabIndex.value,
             onTap: controller.changeTab,
@@ -367,6 +369,47 @@ class _MoreTab extends StatelessWidget {
           const Icon(Icons.chevron_right, color: AppColors.textMuted),
       onTap: onTap,
       contentPadding: EdgeInsets.zero,
+    );
+  }
+}
+
+class _GetHelpButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => SupportBottomSheet.show(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppColors.primary, AppColors.accent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.35),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.headset_mic_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              'Get Help',
+              style: AppTextStyles.label.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
