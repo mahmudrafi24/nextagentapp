@@ -1,0 +1,17 @@
+keytool -genkey -v -keystore "$HOME\my-release-key.jks" -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
+Enter keystore password: genailabs
+
+Re-enter new password: genailabs
+
+What is your first and last name? :  Laith
+What is the name of your organizational unit?:  NextAgent
+What is the name of your organization?:  Genailabs
+What is the name of your City or Locality?:  Amman
+What is the name of your State or Province?:  Jordan
+What is the two-letter country code for this unit?:  JOR
+Is CN=Laith, OU=NextAgent, O=Genailabs, L=Amman, ST=Jordan, C=JOR correct?
+  [no]:  yes
+
+Generating 2,048 bit RSA key pair and self-signed certificate (SHA256withRSA) with a validity of 10,000 days
+        for: CN=Laith, OU=NextAgent, O=Genailabs, L=Amman, ST=Jordan, C=JOR
+[Storing C:\Users\rafi2\my-release-key.jks]
