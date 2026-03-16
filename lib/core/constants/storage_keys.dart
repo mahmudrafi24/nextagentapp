@@ -6,6 +6,7 @@ class StorageKeys {
   static const String currentPersona = 'current_persona';
   static const String onboardingComplete = 'onboarding_complete';
   static const String apiKey = 'openclaw_api_key';
+  static const String selectedModel = 'selected_model';
   static const String themeMode = 'theme_mode';
 }
 

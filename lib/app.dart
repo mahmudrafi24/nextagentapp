@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../core/constants/app_constants.dart';
-import '../core/theme/app_theme.dart';
-import '../presentation/controllers/settings_controller.dart';
-import 'routes/app_pages.dart';
-import 'routes/app_routes.dart';
+import 'core/constants/app_constants.dart';
+import 'core/theme/app_theme.dart';
+import 'presentation/controllers/settings_controller.dart';
+import 'app/routes/app_pages.dart';
+import 'app/routes/app_routes.dart';
 
 class OpenClawApp extends StatelessWidget {
   const OpenClawApp({super.key});

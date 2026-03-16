@@ -1,7 +1,7 @@
 name: nextagent
 description: "OpenClaw AI Assistant - Your smart personal AI companion"
-publish_to: 'none'
-version: 1.0.0+1
+publish_to: "none"
+version: 1.0.2+3
 
 environment:
   sdk: ^3.10.4
