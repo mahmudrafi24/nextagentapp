@@ -1,11 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../app/routes/app_routes.dart';
-import '../../../core/network/dio_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/utils/validators.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../data/datasources/local/storage_service.dart';
@@ -23,15 +20,13 @@ class OnboardingPage extends StatefulWidget {
 class _OnboardingPageState extends State<OnboardingPage> {
   final _pageController = PageController();
   final _nameController = TextEditingController();
-  final _apiKeyController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   int _currentPage = 0;
+  String _selectedModel = 'claude';
 
   @override
   void dispose() {
     _pageController.dispose();
     _nameController.dispose();
-    _apiKeyController.dispose();
     super.dispose();
   }
 
@@ -52,20 +47,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
   }
 
   void _complete() {
-    if (!_formKey.currentState!.validate()) return;
-
     final storage = Get.find<StorageService>();
     final settings = Get.find<SettingsController>();
 
     storage.saveUserName(_nameController.text.trim());
     settings.updateUserName(_nameController.text.trim());
 
-    storage.saveApiKey(_apiKeyController.text.trim());
-    settings.updateApiKey(_apiKeyController.text.trim());
-
-    // Update Dio with new API key
-    final dio = Get.find<Dio>();
-    DioClient.updateApiKey(dio, _apiKeyController.text.trim());
+    storage.saveSelectedModel(_selectedModel);
+    settings.updateSelectedModel(_selectedModel);
 
     storage.setOnboardingComplete();
     Get.offAllNamed(AppRoutes.home);
@@ -106,7 +95,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 children: [
                   _buildNamePage(),
                   _buildPersonaPage(),
-                  _buildApiKeyPage(),
+                  _buildModelSelectionPage(),
                 ],
               ),
             ),
@@ -261,74 +250,113 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Widget _buildApiKeyPage() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Enter Your API Key",
-                    style: AppTextStyles.heading1.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+  static const List<Map<String, String>> _aiModels = [
+    {'id': 'chatgpt', 'name': 'ChatGPT', 'icon': '\u{1F7E2}', 'desc': 'OpenAI\'s versatile language model'},
+    {'id': 'claude', 'name': 'Claude', 'icon': '\u{1F7E3}', 'desc': 'Anthropic\'s helpful AI assistant'},
+    {'id': 'grok', 'name': 'Grok', 'icon': '\u{26A1}', 'desc': 'xAI\'s witty and informative model'},
+    {'id': 'deepseek', 'name': 'DeepSeek', 'icon': '\u{1F50D}', 'desc': 'Advanced reasoning AI model'},
+    {'id': 'moonshot', 'name': 'Moonshot', 'icon': '\u{1F319}', 'desc': 'Kimi\'s powerful language model'},
+  ];
+
+  Widget _buildModelSelectionPage() {
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Choose Your AI Model",
+                  style: AppTextStyles.heading1.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Your OpenClaw API key is stored locally on your device and never shared.",
-                    style: AppTextStyles.body.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "Select the AI model you'd like to use. You can change this later in settings.",
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 40),
-                  AppTextField(
-                    controller: _apiKeyController,
-                    hintText: 'sk-...',
-                    prefixIcon: Icons.key_outlined,
-                    validator: Validators.validateApiKey,
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.lock_outline,
-                            color: AppColors.accent, size: 20),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Your API key is stored securely on this device only.',
-                            style: AppTextStyles.caption.copyWith(
-                              color: AppColors.accent,
+                ),
+                const SizedBox(height: 24),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: _aiModels.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final model = _aiModels[index];
+                      final isSelected = _selectedModel == model['id'];
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() => _selectedModel = model['id']!);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary.withValues(alpha: 0.15)
+                                : Theme.of(context).cardTheme.color,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              width: 1.5,
                             ),
                           ),
+                          child: Row(
+                            children: [
+                              Text(model['icon']!,
+                                  style: const TextStyle(fontSize: 28)),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      model['name']!,
+                                      style: AppTextStyles.heading3.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      model['desc']!,
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (isSelected)
+                                const Icon(Icons.check_circle,
+                                    color: AppColors.primary),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-            child: AppButton(
-              text: "Let's Go!",
-              onPressed: _complete,
-              width: double.infinity,
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: AppButton(
+            text: "Let's Go!",
+            onPressed: _complete,
+            width: double.infinity,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

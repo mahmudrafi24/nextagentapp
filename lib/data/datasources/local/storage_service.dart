@@ -28,6 +28,12 @@ class StorageService {
   String getCurrentPersona() =>
       _storage.read<String>(StorageKeys.currentPersona) ?? 'assistant';
 
+  // Selected Model
+  void saveSelectedModel(String model) =>
+      _storage.write(StorageKeys.selectedModel, model);
+  String getSelectedModel() =>
+      _storage.read<String>(StorageKeys.selectedModel) ?? 'claude';
+
   // Theme
   void saveThemeMode(String mode) =>
       _storage.write(StorageKeys.themeMode, mode);

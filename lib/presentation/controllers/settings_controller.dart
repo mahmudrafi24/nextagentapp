@@ -16,6 +16,7 @@ class SettingsController extends GetxController {
   final Rx<ThemeMode> themeMode = ThemeMode.dark.obs;
   final RxString apiKey = ''.obs;
   final RxString userName = ''.obs;
+  final RxString selectedModel = 'claude'.obs;
 
   @override
   void onInit() {
@@ -28,6 +29,7 @@ class SettingsController extends GetxController {
     themeMode.value = mode == 'light' ? ThemeMode.light : ThemeMode.dark;
     apiKey.value = _storageService.getApiKey() ?? '';
     userName.value = _storageService.getUserName() ?? '';
+    selectedModel.value = _storageService.getSelectedModel();
   }
 
   void toggleTheme() {
@@ -53,6 +55,11 @@ class SettingsController extends GetxController {
   Future<void> clearAllData() async {
     await _hiveService.clearAll();
     await _storageService.clearAll();
+  }
+
+  void updateSelectedModel(String model) {
+    selectedModel.value = model;
+    _storageService.saveSelectedModel(model);
   }
 
   bool get hasApiKey => apiKey.value.isNotEmpty;
